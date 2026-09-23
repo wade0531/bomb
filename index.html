@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>語氣拆彈專家：把「你」變成「我」</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Noto Sans TC -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+          },
+          colors: {
+            bomb: {
+              light: '#fca5a5',
+              DEFAULT: '#ef4444',
+              dark: '#b91c1c',
+            },
+            shield: {
+              light: '#6ee7b7',
+              DEFAULT: '#10b981',
+              dark: '#047857',
+            }
+          },
+          animation: {
+            'shake': 'shake 0.5s cubic-bezier(.36,.07,.19,.97) both',
+            'bounce-slow': 'bounce 3s infinite',
+          },
+          keyframes: {
+            shake: {
+              '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+              '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+              '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+              '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0f172a;
+      background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0f172a 70%);
+      color: #f8fafc;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .bomb-gradient {
+      background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+    }
+
+    .shield-gradient {
+      background: linear-gradient(135deg, #10b981 0%, #065f46 100%);
+    }
+    
+    /* Hide elements for smooth transitions */
+    .hidden-state {
+      display: none !important;
+    }
+  </style>
+</head>
+<body class="flex flex-col items-center justify-between font-sans">
+
+  <header class="w-full max-w-4xl mx-auto p-4 flex justify-between items-center relative z-10">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-slate-800 flex items-center justify-center text-xl shadow-lg border border-slate-700">
+        <i class="fa-solid fa-bomb text-red-400"></i>
+      </div>
+      <div>
+        <h1 class="text-xl md:text-2xl font-black tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-red-400 to-amber-300">語氣拆彈專家</h1>
+        <p class="text-xs text-slate-400 font-medium">把「你」變成「我」</p>
+      </div>
+    </div>
+    
+    <!-- Progress Indicator -->
+    <div id="progressContainer" class="hidden-state flex items-center gap-2 bg-slate-800 px-4 py-2 rounded-full border border-slate-700">
+      <div class="text-sm font-bold text-slate-300"><span id="currentStageText">任務一</span></div>
+      <div class="w-24 md:w-32 h-2 bg-slate-700 rounded-full overflow-hidden">
+        <div id="progressBar" class="h-full bg-gradient-to-r from-amber-400 to-emerald-400 w-1/3 transition-all duration-500"></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="w-full max-w-4xl mx-auto p-4 flex-1 flex flex-col justify-center relative z-10">
+    
+    <!-- App Views Container -->
+    <div id="appContainer" class="relative w-full">
+
+      <!-- View 0: Intro Screen -->
+      <div id="viewIntro" class="glass-panel rounded-3xl p-8 md:p-12 text-center transform transition-all duration-500 scale-100 opacity-100">
+        <div class="text-6xl md:text-8xl mb-6 animate-bounce-slow">🧑‍🚀</div>
+        <h2 class="text-3xl md:text-4xl font-black mb-4">歡迎加入「語氣拆彈小隊」！</h2>
+        <p class="text-slate-300 text-lg md:text-xl leading-relaxed mb-8 max-w-2xl mx-auto">
+          在日常生活中，指責別人的<strong class="text-red-400">「你訊息」</strong>就像是一顆隨時會引爆人際衝突的地雷💣。<br>
+          今天的任務，是要學習使用堅定又溫和的<strong class="text-emerald-400">「我訊息」</strong>🛡️來拆除這些炸彈！<br>
+          你準備好接受挑戰了嗎？
+        </p>
+        <button onclick="startGame()" class="bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xl px-10 py-4 rounded-full shadow-[0_0_20px_rgba(245,158,11,0.5)] transform hover:scale-105 transition-all duration-300">
+          <i class="fa-solid fa-play mr-2"></i> 開始任務
+        </button>
+      </div>
+
+      <div id="viewLevel1" class="hidden-state glass-panel rounded-3xl p-6 md:p-10 text-center">
+        <div class="mb-6">
+          <span class="bg-amber-500/20 text-amber-400 px-4 py-1 rounded-full text-sm font-bold border border-amber-500/30">任務一：雷達掃描</span>
+          <h2 class="text-2xl md:text-3xl font-bold mt-4">這是炸彈還是防護罩？</h2>
+          <p class="text-slate-400 mt-2">請判斷下方的句子是容易引發衝突的「你訊息」，還是能促進溝通的「我訊息」。</p>
+        </div>
+
+        <!-- Question Display -->
+        <div class="bg-slate-800/80 border border-slate-600 rounded-2xl p-6 md:p-10 mb-8 min-h-[150px] flex items-center justify-center shadow-inner relative overflow-hidden">
+          <div id="l1-feedback" class="absolute inset-0 flex items-center justify-center bg-black/80 z-10 hidden-state backdrop-blur-sm transition-opacity">
+            <!-- Feedback content injected via JS -->
+          </div>
+          <h3 id="l1-statement" class="text-2xl md:text-3xl font-bold text-white leading-tight">載入中...</h3>
+        </div>
+
+        <div class="flex flex-col md:flex-row justify-center gap-4 md:gap-8 w-full max-w-2xl mx-auto">
+          <button onclick="checkLevel1(false)" class="flex-1 bomb-gradient hover:brightness-110 border-2 border-red-300/30 text-white font-bold text-xl px-6 py-5 rounded-2xl shadow-lg transform hover:-translate-y-1 transition-all group">
+            <i class="fa-solid fa-bomb text-3xl mb-2 group-hover:scale-110 transition-transform"></i>
+            <br>💣 這是「你訊息」
+            <p class="text-xs font-normal mt-1 opacity-80">(充滿指責與批評)</p>
+          </button>
+          <button onclick="checkLevel1(true)" class="flex-1 shield-gradient hover:brightness-110 border-2 border-emerald-300/30 text-white font-bold text-xl px-6 py-5 rounded-2xl shadow-lg transform hover:-translate-y-1 transition-all group">
+            <i class="fa-solid fa-shield-heart text-3xl mb-2 group-hover:scale-110 transition-transform"></i>
+            <br>🛡️ 這是「我訊息」
+            <p class="text-xs font-normal mt-1 opacity-80">(表達客觀與感受)</p>
+          </button>
+        </div>
+        
+        <div class="mt-6 text-slate-400 font-mono text-sm">進度: <span id="l1-progress">1 / 4</span></div>
+      </div>
+
+      <div id="viewLevel2" class="hidden-state glass-panel rounded-3xl p-6 md:p-10">
+        <div class="text-center mb-6">
+          <span class="bg-blue-500/20 text-blue-400 px-4 py-1 rounded-full text-sm font-bold border border-blue-500/30">任務二：拆彈公式</span>
+          <h2 class="text-2xl md:text-3xl font-bold mt-4">掌握「我訊息」三大要素</h2>
+          <p class="text-slate-400 mt-2">點擊下方詞彙，依照正確順序填入公式中！</p>
+        </div>
+
+        <div class="bg-slate-800 rounded-2xl p-6 border border-slate-700 mb-8 flex flex-col md:flex-row items-center gap-4 text-center md:text-left justify-center">
+           <div id="slot1" onclick="unfillSlot(1)" class="w-full md:w-48 h-20 border-2 border-dashed border-slate-500 rounded-xl flex items-center justify-center text-slate-400 cursor-pointer hover:border-emerald-400 transition-colors bg-slate-900/50">
+             1. [ 當我看/聽到... ]
+           </div>
+           <i class="fa-solid fa-plus text-slate-500"></i>
+           <div id="slot2" onclick="unfillSlot(2)" class="w-full md:w-48 h-20 border-2 border-dashed border-slate-500 rounded-xl flex items-center justify-center text-slate-400 cursor-pointer hover:border-emerald-400 transition-colors bg-slate-900/50">
+             2. [ 我覺得... ]
+           </div>
+           <i class="fa-solid fa-plus text-slate-500"></i>
+           <div id="slot3" onclick="unfillSlot(3)" class="w-full md:w-48 h-20 border-2 border-dashed border-slate-500 rounded-xl flex items-center justify-center text-slate-400 cursor-pointer hover:border-emerald-400 transition-colors bg-slate-900/50">
+             3. [ 我希望... ]
+           </div>
+        </div>
+
+        <!-- Word Bank -->
+        <div id="wordBank" class="flex flex-wrap justify-center gap-4 mb-8">
+          <button id="btn-feel" onclick="fillSlot('feel', '個人感受')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-6 rounded-xl shadow transition transform hover:scale-105 active:scale-95">個人感受</button>
+          <button id="btn-expect" onclick="fillSlot('expect', '正向期望')" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-6 rounded-xl shadow transition transform hover:scale-105 active:scale-95">正向期望</button>
+          <button id="btn-event" onclick="fillSlot('event', '客觀事件')" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl shadow transition transform hover:scale-105 active:scale-95">客觀事件</button>
+        </div>
+
+        <div class="text-center">
+          <button id="checkFormulaBtn" onclick="checkFormula()" class="bg-slate-600 text-slate-300 font-bold px-8 py-3 rounded-full cursor-not-allowed transition-all" disabled>
+            驗證公式
+          </button>
+        </div>
+        
+        <!-- Feedback Modal for Level 2 -->
+        <div id="l2-feedback" class="absolute inset-0 bg-black/90 backdrop-blur-md rounded-3xl z-20 flex flex-col items-center justify-center hidden-state p-6 text-center">
+          <div id="l2-icon" class="text-7xl mb-4"></div>
+          <h3 id="l2-title" class="text-3xl font-bold mb-2"></h3>
+          <p id="l2-desc" class="text-lg text-slate-300 mb-6"></p>
+          <button id="l2-actionBtn" class="bg-emerald-500 text-white font-bold px-8 py-3 rounded-full hover:bg-emerald-400 transition"></button>
+        </div>
+      </div>
+
+      <div id="viewLevel3" class="hidden-state glass-panel rounded-3xl p-6 md:p-8">
+        <div class="text-center mb-6">
+          <span class="bg-purple-500/20 text-purple-400 px-4 py-1 rounded-full text-sm font-bold border border-purple-500/30">最終任務：實戰拆彈</span>
+          <h2 class="text-2xl md:text-3xl font-bold mt-4">把「你」變成「我」</h2>
+          <p class="text-slate-400 mt-1">閱讀情境與地雷對話，選出最棒的「我訊息」組合來化解衝突！</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+          <!-- Scenario Info -->
+          <div class="bg-slate-800/80 rounded-2xl p-5 border border-slate-600 relative">
+            <div class="absolute -top-3 -left-3 text-4xl">🎬</div>
+            <h3 class="text-emerald-400 font-bold mb-2 text-lg border-b border-slate-600 pb-2">情境任務</h3>
+            <p id="l3-scenario" class="text-slate-200 text-md leading-relaxed mb-4">
+              <!-- Scenario text -->
+            </p>
+            <div class="bg-red-900/40 border border-red-500/30 p-4 rounded-xl">
+              <span class="text-red-400 font-bold text-sm block mb-1">💣 爆炸的「你訊息」對話：</span>
+              <p id="l3-youmsg" class="text-red-100 font-medium italic">"你真的很誇張！"</p>
+            </div>
+          </div>
+
+          <!-- Rewrite Area -->
+          <div class="flex flex-col gap-4">
+            <h3 class="text-blue-400 font-bold text-lg"><i class="fa-solid fa-wrench mr-2"></i>重組「我訊息」</h3>
+            
+            <div class="flex flex-col gap-3" id="l3-options">
+               <!-- Options generated by JS -->
+            </div>
+            
+            <button onclick="submitLevel3()" id="l3-submitBtn" class="mt-auto bg-slate-600 text-slate-300 font-bold py-3 rounded-xl cursor-not-allowed transition-all" disabled>
+              送出拆彈
+            </button>
+          </div>
+        </div>
+        
+        <div class="mt-4 text-center text-slate-400 font-mono text-sm">進度: <span id="l3-progress">1 / 3</span></div>
+
+        <!-- Feedback Overlay for Level 3 -->
+        <div id="l3-feedback" class="absolute inset-0 bg-black/90 backdrop-blur-md rounded-3xl z-20 flex flex-col items-center justify-center hidden-state p-8 text-center">
+          <div id="l3-icon" class="text-7xl mb-4"></div>
+          <h3 id="l3-title" class="text-3xl font-bold mb-3"></h3>
+          <p id="l3-desc" class="text-lg text-slate-300 mb-8 max-w-lg leading-relaxed"></p>
+          <button id="l3-actionBtn" class="bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-10 py-4 rounded-full transition shadow-lg text-lg"></button>
+        </div>
+      </div>
+
+      <div id="viewResult" class="hidden-state glass-panel rounded-3xl p-8 md:p-12 text-center">
+        <div class="text-7xl mb-6">🏆</div>
+        <h2 class="text-4xl md:text-5xl font-black mb-4 text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-amber-500">任務圓滿達成！</h2>
+        <p class="text-slate-300 text-xl mb-6">恭喜你獲得「語氣拆彈專家」認證徽章！</p>
+        
+        <div class="bg-slate-800/80 rounded-2xl p-6 border border-slate-600 mb-8 max-w-xl mx-auto text-left">
+          <h3 class="text-emerald-400 font-bold mb-3 border-b border-slate-700 pb-2">🔑 專家守則回顧：</h3>
+          <ul class="text-slate-200 space-y-3">
+            <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> 不用「你...」開頭來指責對方。</li>
+            <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> <strong class="text-amber-300">客觀說出事件</strong>，不誇大、不加油添醋。</li>
+            <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> <strong class="text-amber-300">誠實表達感受</strong>，讓對方知道你的心情。</li>
+            <li><i class="fa-solid fa-check text-emerald-500 mr-2"></i> <strong class="text-amber-300">提出正向期望</strong>，告訴對方可以怎麼做。</li>
+          </ul>
+        </div>
+        
+        <button onclick="location.reload()" class="bg-slate-700 hover:bg-slate-600 text-white font-bold text-lg px-8 py-3 rounded-full transition-all">
+          <i class="fa-solid fa-rotate-right mr-2"></i> 再玩一次
+        </button>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="w-full text-center p-4 text-slate-500 text-sm mt-4 z-10 relative">
+    &copy; 2026 綜合活動領域：人際溝通教材 | 僅供課堂教學體驗使用
+  </footer>
+
+  <script>
+    /* ================= State Management ================= */
+    let currentStage = 0; // 0: intro, 1: level1, 2: level2, 3: level3, 4: result
+    
+    // Level 1 Data
+    const level1Data = [
+      { text: "「你每次都遲到，到底要讓別人等多久？很自私耶！」", isI: false, exp: "這句話充滿了批評（你每次都、自私），容易激怒對方。" },
+      { text: "「當我看到你沒回訊息，我覺得很擔心，希望你能報個平安。」", isI: true, exp: "這句話包含了事件、感受與期望，是很棒的我訊息！" },
+      { text: "「你真的很扯！借東西都不還，我以後絕對不借你了！」", isI: false, exp: "情緒化的字眼（很扯、絕對不）會讓溝通瞬間破裂。" },
+      { text: "「當聽到你說我作弊，我覺得很委屈，希望你能查清楚再說。」", isI: true, exp: "清楚表達自己的委屈，並提出希望對方查清楚的期望。" }
+    ];
+    let l1Index = 0;
+
+    // Level 2 Data (Formula)
+    let formulaSlots = [null, null, null]; // [0: event, 1: feel, 2: expect]
+    const correctFormula = ['event', 'feel', 'expect'];
+
+    // Level 3 Data (Scenarios)
+    const level3Data = [
+      {
+        scenario: "分組報告時，同組的小華一直在滑手機，沒有幫忙查資料。你感到很生氣又著急。",
+        youMsg: "「你真的很雷耶！都不做事只會滑手機，分數都給你扣光好了！」",
+        correctIndex: 1, // 0-based
+        options: [
+          "當我看到你滑手機，我覺得你很爛，希望你馬上退組。",
+          "當我看到你都在滑手機沒查資料，我覺得很著急，希望我們能一起把報告完成。",
+          "我覺得很煩，因為你都不幫忙，你這人真的很不負責任。"
+        ],
+        exp: "選項(B)精確說出【事件:滑手機沒查資料】、【感受:著急】、【期望:一起完成】。選項(A)和(C)仍然帶有人身攻擊。"
+      },
+      {
+        scenario: "妹妹沒有經過你的同意，就拿走你最心愛的麥克筆去畫畫。",
+        youMsg: "「你這小偷！誰准你拿我的東西？你給我滾出去！」",
+        correctIndex: 2,
+        options: [
+          "當我看到麥克筆被拿走，我覺得妹妹是個壞小孩，希望妳被媽媽罵。",
+          "我希望妳不要再偷拿我東西了，我覺得妳這樣真的很討厭。",
+          "當我發現妳沒問過就拿走麥克筆，我覺得不被尊重，希望妳下次拿之前先問我。"
+        ],
+        exp: "選項(C)完美符合公式。選項(A)的感受是批評(壞小孩)；選項(B)順序顛倒且帶有批評(討厭)。"
+      },
+      {
+        scenario: "好朋友小明最近下課都不理你，直接跑去跟別人打球，你覺得被冷落了。",
+        youMsg: "「你很重色輕友欸！有了新朋友就不要舊朋友了是不是？」",
+        correctIndex: 0,
+        options: [
+          "當我下課看到你直接去找別人，我覺得有點失落，希望我們這節課可以一起去福利社。",
+          "當我發現你不理我，我覺得你背叛我，希望你不要再跟他們打球了。",
+          "我覺得很生氣，當我看到你跟別人玩，希望你馬上過來跟我道歉。"
+        ],
+        exp: "選項(A)溫和地表達了失落感，並提出具體可行的期望。選項(B)和(C)的用語過於強烈(背叛)且要求不合理。"
+      }
+    ];
+    let l3Index = 0;
+    let selectedL3Option = null;
+
+    /* ================= Helper Functions ================= */
+    function hideAllViews() {
+      document.getElementById('viewIntro').classList.add('hidden-state');
+      document.getElementById('viewLevel1').classList.add('hidden-state');
+      document.getElementById('viewLevel2').classList.add('hidden-state');
+      document.getElementById('viewLevel3').classList.add('hidden-state');
+      document.getElementById('viewResult').classList.add('hidden-state');
+    }
+
+    function updateProgress(stageName, percent) {
+      document.getElementById('progressContainer').classList.remove('hidden-state');
+      document.getElementById('currentStageText').innerText = stageName;
+      document.getElementById('progressBar').style.width = percent + '%';
+    }
+
+    /* ================= Intro & Navigation ================= */
+    function startGame() {
+      currentStage = 1;
+      hideAllViews();
+      document.getElementById('viewLevel1').classList.remove('hidden-state');
+      updateProgress('任務一：雷達掃描', 10);
+      loadLevel1();
+    }
+
+    /* ================= Level 1 Logic ================= */
+    function loadLevel1() {
+      const q = level1Data[l1Index];
+      document.getElementById('l1-statement').innerText = q.text;
+      document.getElementById('l1-progress').innerText = `${l1Index + 1} / ${level1Data.length}`;
+      document.getElementById('l1-feedback').classList.add('hidden-state');
+    }
+
+    function checkLevel1(isUserGuessI) {
+      const q = level1Data[l1Index];
+      const isCorrect = (isUserGuessI === q.isI);
+      const fb = document.getElementById('l1-feedback');
+      
+      fb.classList.remove('hidden-state');
+      
+      if (isCorrect) {
+        fb.innerHTML = `
+          <div class="text-center bg-slate-900/90 p-8 rounded-2xl border-2 border-emerald-500 shadow-lg transform scale-110 transition-transform">
+            <div class="text-6xl mb-4 text-emerald-400"><i class="fa-solid fa-circle-check"></i></div>
+            <h4 class="text-2xl font-bold text-white mb-2">判斷正確！</h4>
+            <p class="text-slate-300 mb-6 text-sm md:text-base">${q.exp}</p>
+            <button onclick="nextLevel1()" class="bg-emerald-500 text-white px-6 py-2 rounded-full font-bold">下一題</button>
+          </div>
+        `;
+      } else {
+        document.getElementById('viewLevel1').classList.add('animate-shake');
+        setTimeout(() => document.getElementById('viewLevel1').classList.remove('animate-shake'), 500);
+        
+        fb.innerHTML = `
+          <div class="text-center bg-slate-900/90 p-8 rounded-2xl border-2 border-red-500 shadow-lg transform scale-110 transition-transform">
+            <div class="text-6xl mb-4 text-red-500"><i class="fa-solid fa-bomb"></i></div>
+            <h4 class="text-2xl font-bold text-white mb-2">哎呀，判斷錯誤！</h4>
+            <p class="text-slate-300 mb-6 text-sm md:text-base">${q.exp}</p>
+            <button onclick="nextLevel1()" class="bg-red-500 text-white px-6 py-2 rounded-full font-bold">繼續挑戰</button>
+          </div>
+        `;
+      }
+    }
+
+    function nextLevel1() {
+      l1Index++;
+      if (l1Index < level1Data.length) {
+        updateProgress('任務一：雷達掃描', 10 + (l1Index * 10));
+        loadLevel1();
+      } else {
+        // Go to Level 2
+        hideAllViews();
+        document.getElementById('viewLevel2').classList.remove('hidden-state');
+        updateProgress('任務二：拆彈公式', 40);
+      }
+    }
+
+    /* ================= Level 2 Logic ================= */
+    const slotNames = { 'event': '客觀事件', 'feel': '個人感受', 'expect': '正向期望' };
+    const slotColors = { 'event': 'bg-emerald-600 border-emerald-400', 'feel': 'bg-blue-600 border-blue-400', 'expect': 'bg-purple-600 border-purple-400' };
+
+    function fillSlot(type, label) {
+      // Find first empty slot
+      const emptyIdx = formulaSlots.indexOf(null);
+      if (emptyIdx === -1) return; // All full
+
+      formulaSlots[emptyIdx] = type;
+      
+      // Update UI
+      const slotEl = document.getElementById(`slot${emptyIdx + 1}`);
+      slotEl.innerHTML = label;
+      slotEl.className = `w-full md:w-48 h-20 border-2 rounded-xl flex items-center justify-center text-white font-bold cursor-pointer transition-colors shadow-lg transform hover:scale-105 ${slotColors[type]}`;
+      
+      // Hide button
+      document.getElementById(`btn-${type}`).classList.add('hidden-state');
+
+      checkLevel2Ready();
+    }
+
+    function unfillSlot(slotNum) {
+      const idx = slotNum - 1;
+      const type = formulaSlots[idx];
+      if (!type) return;
+
+      // Reset array
+      formulaSlots[idx] = null;
+
+      // Reset slot UI
+      const prefixes = ["1. [ 當我看/聽到... ]", "2. [ 我覺得... ]", "3. [ 我希望... ]"];
+      const slotEl = document.getElementById(`slot${slotNum}`);
+      slotEl.innerHTML = prefixes[idx];
+      slotEl.className = "w-full md:w-48 h-20 border-2 border-dashed border-slate-500 rounded-xl flex items-center justify-center text-slate-400 cursor-pointer hover:border-emerald-400 transition-colors bg-slate-900/50";
+
+      // Show button
+      document.getElementById(`btn-${type}`).classList.remove('hidden-state');
+
+      checkLevel2Ready();
+    }
+
+    function checkLevel2Ready() {
+      const btn = document.getElementById('checkFormulaBtn');
+      if (formulaSlots.every(slot => slot !== null)) {
+        btn.disabled = false;
+        btn.className = "bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-xl px-10 py-4 rounded-full shadow-[0_0_15px_rgba(16,185,129,0.5)] transform hover:scale-105 transition-all cursor-pointer";
+      } else {
+        btn.disabled = true;
+        btn.className = "bg-slate-600 text-slate-300 font-bold px-10 py-4 rounded-full cursor-not-allowed transition-all";
+      }
+    }
+
+    function checkFormula() {
+      const isCorrect = formulaSlots.every((val, index) => val === correctFormula[index]);
+      const fb = document.getElementById('l2-feedback');
+      
+      fb.classList.remove('hidden-state');
+      
+      if (isCorrect) {
+        document.getElementById('l2-icon').innerHTML = '<i class="fa-solid fa-unlock-keyhole text-emerald-400"></i>';
+        document.getElementById('l2-title').innerText = "公式解鎖成功！";
+        document.getElementById('l2-desc').innerText = "太棒了！我訊息的順序正是：\n【客觀事件】👉【個人感受】👉【正向期望】";
+        document.getElementById('l2-actionBtn').innerText = "進入最終實戰";
+        document.getElementById('l2-actionBtn').className = "bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-10 py-4 rounded-full transition shadow-lg text-lg mt-4";
+        document.getElementById('l2-actionBtn').onclick = () => {
+          hideAllViews();
+          document.getElementById('viewLevel3').classList.remove('hidden-state');
+          updateProgress('最終任務：實戰拆彈', 65);
+          loadLevel3();
+        };
+      } else {
+        document.getElementById('l2-icon').innerHTML = '<i class="fa-solid fa-triangle-exclamation text-amber-500"></i>';
+        document.getElementById('l2-title').innerText = "順序怪怪的喔！";
+        document.getElementById('l2-desc').innerText = "想一下，通常我們是先「看到某個行為」，接著產生「心裡的感受」，最後才會告訴對方「希望他怎麼做」。\n請點擊框框取消選擇，再試一次！";
+        document.getElementById('l2-actionBtn').innerText = "重新排列";
+        document.getElementById('l2-actionBtn').className = "bg-amber-600 hover:bg-amber-500 text-white font-bold px-10 py-4 rounded-full transition shadow-lg text-lg mt-4";
+        document.getElementById('l2-actionBtn').onclick = () => fb.classList.add('hidden-state');
+      }
+    }
+
+    /* ================= Level 3 Logic ================= */
+    function loadLevel3() {
+      const q = level3Data[l3Index];
+      selectedL3Option = null;
+      
+      document.getElementById('l3-scenario').innerText = q.scenario;
+      document.getElementById('l3-youmsg').innerText = `"${q.youMsg}"`;
+      document.getElementById('l3-progress').innerText = `${l3Index + 1} / ${level3Data.length}`;
+      
+      const optionsContainer = document.getElementById('l3-options');
+      optionsContainer.innerHTML = '';
+      
+      q.options.forEach((opt, index) => {
+        const btn = document.createElement('button');
+        btn.id = `l3-opt-${index}`;
+        btn.className = "w-full text-left p-4 rounded-xl border-2 border-slate-600 bg-slate-800 hover:bg-slate-700 text-slate-200 transition-all focus:outline-none";
+        
+        // Add ABC labels
+        const label = String.fromCharCode(65 + index); // A, B, C
+        btn.innerHTML = `<span class="font-bold text-emerald-400 mr-2">(${label})</span> ${opt}`;
+        
+        btn.onclick = () => selectL3Option(index);
+        optionsContainer.appendChild(btn);
+      });
+      
+      checkL3Ready();
+    }
+
+    function selectL3Option(index) {
+      selectedL3Option = index;
+      
+      // Reset all styles
+      for(let i=0; i<3; i++) {
+        const el = document.getElementById(`l3-opt-${i}`);
+        el.className = "w-full text-left p-4 rounded-xl border-2 border-slate-600 bg-slate-800 text-slate-200 transition-all focus:outline-none";
+      }
+      
+      // Highlight selected
+      const selectedEl = document.getElementById(`l3-opt-${index}`);
+      selectedEl.className = "w-full text-left p-4 rounded-xl border-2 border-emerald-500 bg-emerald-900/30 text-white transition-all focus:outline-none transform scale-[1.02] shadow-lg";
+      
+      checkL3Ready();
+    }
+
+    function checkL3Ready() {
+      const btn = document.getElementById('l3-submitBtn');
+      if (selectedL3Option !== null) {
+        btn.disabled = false;
+        btn.className = "mt-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-xl px-6 py-4 rounded-xl shadow-lg transform hover:scale-105 transition-all cursor-pointer";
+      } else {
+        btn.disabled = true;
+        btn.className = "mt-auto bg-slate-600 text-slate-300 font-bold py-4 rounded-xl cursor-not-allowed transition-all";
+      }
+    }
+
+    function submitLevel3() {
+      const q = level3Data[l3Index];
+      const isCorrect = (selectedL3Option === q.correctIndex);
+      const fb = document.getElementById('l3-feedback');
+      
+      fb.classList.remove('hidden-state');
+      
+      if (isCorrect) {
+        document.getElementById('l3-icon').innerHTML = '<i class="fa-solid fa-shield-heart text-emerald-400 animate-bounce"></i>';
+        document.getElementById('l3-title').innerText = "拆彈成功！";
+        document.getElementById('l3-title').className = "text-3xl font-bold mb-3 text-emerald-400";
+        document.getElementById('l3-desc').innerText = q.exp;
+        
+        let btnText = (l3Index === level3Data.length - 1) ? "查看任務總結" : "前往下一情境";
+        document.getElementById('l3-actionBtn').innerText = btnText;
+        document.getElementById('l3-actionBtn').className = "bg-emerald-500 hover:bg-emerald-400 text-white font-bold px-10 py-4 rounded-full transition shadow-lg text-lg mt-4";
+        
+        document.getElementById('l3-actionBtn').onclick = () => {
+          fb.classList.add('hidden-state');
+          l3Index++;
+          if (l3Index < level3Data.length) {
+            updateProgress('最終任務：實戰拆彈', 65 + (l3Index * 10));
+            loadLevel3();
+          } else {
+            // End of Game
+            hideAllViews();
+            document.getElementById('viewResult').classList.remove('hidden-state');
+            updateProgress('任務完成！', 100);
+          }
+        };
+      } else {
+        document.getElementById('viewLevel3').classList.add('animate-shake');
+        setTimeout(() => document.getElementById('viewLevel3').classList.remove('animate-shake'), 500);
+
+        document.getElementById('l3-icon').innerHTML = '<i class="fa-solid fa-burst text-red-500"></i>';
+        document.getElementById('l3-title').innerText = "炸彈引爆了！";
+        document.getElementById('l3-title').className = "text-3xl font-bold mb-3 text-red-400";
+        document.getElementById('l3-desc').innerText = q.exp + "\n\n請重新閱讀選項，尋找最符合【事件+感受+期望】的句子。";
+        document.getElementById('l3-actionBtn').innerText = "重新拆彈";
+        document.getElementById('l3-actionBtn').className = "bg-red-500 hover:bg-red-400 text-white font-bold px-10 py-4 rounded-full transition shadow-lg text-lg mt-4";
+        document.getElementById('l3-actionBtn').onclick = () => fb.classList.add('hidden-state');
+      }
+    }
+  </script>
+</body>
+</html>
